@@ -4,7 +4,7 @@
 
 Most low-stock alerts warn you when a product drops below a fixed number, like 5 units. But 5 units of something that sells 10 a day is an emergency, and 5 units of something that sells once a month is fine. Runout looks at how fast each product has actually sold over the last 30 days and ranks products by how soon they'll run out, so owners know what to reorder first.
 
-<!-- Add a screenshot here: docs/screenshot.png -->
+![Runout's forecast page in the Shopify admin, listing products from out of stock to no recent sales](docs/screenshot.png)
 
 ## What it does
 
@@ -12,7 +12,7 @@ Most low-stock alerts warn you when a product drops below a fixed number, like 5
 - Sorts the list so the most urgent products are at the top.
 - Labels each product: **Out of stock**, **Reorder now** (under 7 days), **Reorder soon** (7–14 days), **OK**, **No recent sales**, or **Not tracked** (Shopify doesn't count its stock, or it's a gift card, which can't sell out).
 - Suggests how many units to reorder to cover the next 30 days.
-- Includes an **Add demo data** button that fills a test store with 6 products and 5 backdated orders, so you can see it working straight away.
+- Includes an **Add demo data** button that fills a test store with 6 products and 5 backdated orders, so you can see it working straight away. Test stores only accept about one order every 12 seconds, so it paces the orders and can safely be clicked again to finish if Shopify refuses one.
 
 ## How the forecast works
 

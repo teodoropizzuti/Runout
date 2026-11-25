@@ -10,6 +10,7 @@ const VARIANTS_QUERY = `#graphql
     productVariants(first: 100, after: $after) {
       nodes {
         id
+        title
         displayName
         sku
         inventoryQuantity
@@ -18,6 +19,7 @@ const VARIANTS_QUERY = `#graphql
         }
         product {
           id
+          title
           status
           isGiftCard
         }
@@ -100,7 +102,9 @@ async function fetchVariants(admin) {
 
       return {
         id: variant.id,
-        name: variant.displayName,
+        // Products with only one version have a hidden version called
+        // "Default Title". Show just the product name for those.
+        name: variant.title === "Default Title" ? variant.product.title : variant.displayName,
         sku: variant.sku,
         productId: variant.product.id,
         tracked,

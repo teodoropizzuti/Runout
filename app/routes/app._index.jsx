@@ -67,18 +67,19 @@ export default function Index() {
   const isAddingDemo = fetcher.state !== "idle";
   const addDemo = () => fetcher.submit({}, { method: "POST" });
 
-  // Show a short pop-up message once adding demo data finishes.
+  // When adding demo data succeeds, show a short pop-up message.
+  // (Failures are shown in a banner below instead, so there's time to read them.)
+  const demoResult = isAddingDemo ? null : fetcher.data;
   useEffect(() => {
-    const result = fetcher.data;
-    if (!result) return;
-    if (result.error) {
-      shopify.toast.show(result.error, { isError: true });
-    } else if (result.created) {
-      shopify.toast.show(`Added ${result.products} demo products and ${result.orders} orders`);
+    if (!demoResult || demoResult.error) return;
+    if (demoResult.productsCreated === 0 && demoResult.ordersNeeded === 0) {
+      shopify.toast.show("Demo data is already complete");
     } else {
-      shopify.toast.show("Demo data is already in this store");
+      shopify.toast.show(
+        `Demo data ready: added ${demoResult.productsCreated} products and ${demoResult.ordersCreated} orders`,
+      );
     }
-  }, [fetcher.data, shopify]);
+  }, [demoResult, shopify]);
 
   const demoButton = (
     <s-button onClick={addDemo} {...(isAddingDemo ? { loading: true } : {})}>
@@ -95,6 +96,16 @@ export default function Index() {
       >
         Refresh
       </s-button>
+
+      {demoResult?.error && (
+        <s-banner heading="Demo data isn't finished yet" tone="warning">
+          {demoResult.complete === false
+            ? `Added ${demoResult.ordersCreated} of ${demoResult.ordersNeeded} demo orders. `
+            : ""}
+          Shopify said: {demoResult.error} Wait a minute, then click Add demo
+          data again to finish.
+        </s-banner>
+      )}
 
       {error && (
         <s-banner heading="Couldn't load your store's data" tone="critical">
@@ -137,11 +148,11 @@ export default function Index() {
               <s-table-header-row>
                 <s-table-header listSlot="primary">Product</s-table-header>
                 <s-table-header listSlot="inline">Status</s-table-header>
-                <s-table-header format="numeric">In stock</s-table-header>
-                <s-table-header format="numeric">Sold ({report.windowDays} days)</s-table-header>
-                <s-table-header format="numeric">Sold per day</s-table-header>
+                <s-table-header format="numeric">Stock</s-table-header>
+                <s-table-header format="numeric">Sold ({report.windowDays}d)</s-table-header>
+                <s-table-header format="numeric">Per day</s-table-header>
                 <s-table-header listSlot="labeled" format="numeric">Days left</s-table-header>
-                <s-table-header format="numeric">Suggested reorder</s-table-header>
+                <s-table-header format="numeric">Reorder</s-table-header>
               </s-table-header-row>
               <s-table-body>
                 {report.rows.map((row) => {
@@ -186,7 +197,8 @@ export default function Index() {
         <s-stack direction="block" gap="base">
           <s-paragraph>
             Adds 6 coffee-shop products and 5 orders from the last 30 days to
-            this store. Use it on test stores only.
+            this store. Use it on test stores only. Shopify limits how fast
+            test stores can take orders, so this takes about a minute.
           </s-paragraph>
           <s-stack direction="inline" gap="base">
             {demoButton}
