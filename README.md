@@ -31,6 +31,7 @@ Cancelled orders and refunded units aren't counted. Products that sold nothing r
 | Part | What it does |
 |---|---|
 | [`app/runout/forecast.js`](app/runout/forecast.js) | The forecast maths. Plain JavaScript with no Shopify code, so it's easy to test. |
+| [`app/runout/forecast.test.js`](app/runout/forecast.test.js) | 12 automated tests for the maths, including the edge cases between statuses (exactly 7 days left, oversold stock, no sales). |
 | [`app/runout/shopify-data.server.js`](app/runout/shopify-data.server.js) | Fetches product variants, stock levels and the last 30 days of orders from the Shopify Admin GraphQL API, page by page. |
 | [`app/runout/demo-data.server.js`](app/runout/demo-data.server.js) | Creates the demo products (`productSet`) and backdated orders (`orderCreate`). |
 | [`app/routes/app._index.jsx`](app/routes/app._index.jsx) | The forecast page inside the Shopify admin, built with Polaris web components. |
@@ -49,7 +50,13 @@ npm install
 shopify app dev
 ```
 
-Press **P** to open the app in your store, then click **Add demo data**.
+Open the app in your store (the preview link is under **(d) Dev status**), then click **Add demo data**.
+
+To run the tests:
+
+```shell
+npm test
+```
 
 ## Limits and what I'd do next
 
