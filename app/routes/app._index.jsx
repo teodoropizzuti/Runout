@@ -37,6 +37,7 @@ const STATUS_BADGES = {
   soon: { tone: "caution", label: "Reorder soon" },
   ok: { tone: "success", label: "OK" },
   "no-sales": { tone: "neutral", label: "No recent sales" },
+  "not-tracked": { tone: "neutral", label: "Not tracked" },
 };
 
 const SUMMARY_CARDS = [
@@ -105,9 +106,9 @@ export default function Index() {
         <s-section heading="No products to forecast yet">
           <s-stack direction="block" gap="base">
             <s-paragraph>
-              Runout forecasts products whose inventory Shopify tracks. Add
-              tracked products, or fill this test store with demo products and
-              orders to see how it works.
+              Runout forecasts your products&apos; stock. Add some products,
+              or fill this test store with demo products and orders to see
+              how it works.
             </s-paragraph>
             <s-stack direction="inline" gap="base">
               {demoButton}
@@ -153,7 +154,7 @@ export default function Index() {
                       <s-table-cell>
                         <s-badge tone={badge.tone}>{badge.label}</s-badge>
                       </s-table-cell>
-                      <s-table-cell>{row.inStock}</s-table-cell>
+                      <s-table-cell>{row.inStock ?? "—"}</s-table-cell>
                       <s-table-cell>{row.unitsSold}</s-table-cell>
                       <s-table-cell>{row.dailyRate.toFixed(1)}</s-table-cell>
                       <s-table-cell>{formatDaysLeft(row.daysLeft)}</s-table-cell>

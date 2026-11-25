@@ -56,6 +56,12 @@ export default function HowItWorks() {
             the last {WINDOW_DAYS} days, so there&apos;s no rate to forecast
             from.
           </s-list-item>
+          <s-list-item>
+            <s-badge tone="neutral">Not tracked</s-badge> Shopify doesn&apos;t
+            count stock for this product, or it&apos;s a gift card, which
+            can&apos;t sell out. Turn on &quot;Track quantity&quot; in the
+            product to forecast it.
+          </s-list-item>
         </s-unordered-list>
       </s-section>
 

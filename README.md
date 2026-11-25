@@ -10,7 +10,7 @@ Most low-stock alerts warn you when a product drops below a fixed number, like 5
 
 - Shows every tracked product with its stock, recent sales, daily sales rate and **days until it sells out**.
 - Sorts the list so the most urgent products are at the top.
-- Labels each product: **Out of stock**, **Reorder now** (under 7 days), **Reorder soon** (7–14 days), **OK**, or **No recent sales**.
+- Labels each product: **Out of stock**, **Reorder now** (under 7 days), **Reorder soon** (7–14 days), **OK**, **No recent sales**, or **Not tracked** (Shopify doesn't count its stock, or it's a gift card, which can't sell out).
 - Suggests how many units to reorder to cover the next 30 days.
 - Includes an **Add demo data** button that fills a test store with 6 products and 5 backdated orders, so you can see it working straight away.
 
@@ -31,7 +31,7 @@ Cancelled orders and refunded units aren't counted. Products that sold nothing r
 | Part | What it does |
 |---|---|
 | [`app/runout/forecast.js`](app/runout/forecast.js) | The forecast maths. Plain JavaScript with no Shopify code, so it's easy to test. |
-| [`app/runout/forecast.test.js`](app/runout/forecast.test.js) | 12 automated tests for the maths, including the edge cases between statuses (exactly 7 days left, oversold stock, no sales). |
+| [`app/runout/forecast.test.js`](app/runout/forecast.test.js) | 14 automated tests for the maths, including the edge cases between statuses (exactly 7 days left, oversold stock, no sales, untracked products). |
 | [`app/runout/shopify-data.server.js`](app/runout/shopify-data.server.js) | Fetches product variants, stock levels and the last 30 days of orders from the Shopify Admin GraphQL API, page by page. |
 | [`app/runout/demo-data.server.js`](app/runout/demo-data.server.js) | Creates the demo products (`productSet`) and backdated orders (`orderCreate`). |
 | [`app/routes/app._index.jsx`](app/routes/app._index.jsx) | The forecast page inside the Shopify admin, built with Polaris web components. |

@@ -56,6 +56,15 @@ test("nothing sold recently -> no recent sales, no forecast, no reorder", () => 
   assert.equal(result.reorderQuantity, 0);
 });
 
+test("not tracked -> 'not-tracked', never 'out of stock', even with sales", () => {
+  // e.g. a gift card: it sells, but Shopify has no stock count for it.
+  const result = forecastVariant({ inStock: null, unitsSold: 20, tracked: false });
+
+  assert.equal(result.status, "not-tracked");
+  assert.equal(result.daysLeft, null);
+  assert.equal(result.reorderQuantity, 0);
+});
+
 // ---- The edges between statuses ----
 // "Under 7 days" is urgent, so exactly 7 should NOT be urgent.
 
@@ -106,6 +115,18 @@ test("the list is sorted most urgent first", () => {
   assert.deepEqual(order, ["filters", "tamper", "beans", "kettle", "mug", "tote"]);
 });
 
+test("untracked products go to the bottom of the list, below no recent sales", () => {
+  const variants = [
+    { id: "gift-card", inStock: null, tracked: false },
+    { id: "tote", inStock: 30, tracked: true },
+    { id: "filters", inStock: 0, tracked: true },
+  ];
+  const unitsSold = new Map([["gift-card", 12], ["filters", 15]]);
+
+  const order = buildForecasts(variants, unitsSold).map((row) => row.id);
+  assert.deepEqual(order, ["filters", "tote", "gift-card"]);
+});
+
 test("a product with no orders at all counts as 0 sold", () => {
   const rows = buildForecasts([{ id: "new-product", inStock: 8 }], new Map());
 
@@ -117,5 +138,5 @@ test("the summary counts how many products are in each status", () => {
   const counts = summarize(demoForecasts());
 
   // assert.deepEqual compares objects field by field.
-  assert.deepEqual(counts, { out: 1, urgent: 2, soon: 1, ok: 1, "no-sales": 1 });
+  assert.deepEqual(counts, { out: 1, urgent: 2, soon: 1, ok: 1, "no-sales": 1, "not-tracked": 0 });
 });

@@ -19,6 +19,7 @@ const VARIANTS_QUERY = `#graphql
         product {
           id
           status
+          isGiftCard
         }
       }
       pageInfo {
@@ -79,20 +80,34 @@ async function fetchAllPages(admin, query, field, variables = {}) {
   return items;
 }
 
-/** Stock levels for variants that are tracked and not archived. */
-async function fetchTrackedVariants(admin) {
+/**
+ * Stock levels for every variant that isn't archived.
+ * Untracked variants are kept (and marked) so owners can see why they have no forecast.
+ */
+async function fetchVariants(admin) {
   const variants = await fetchAllPages(admin, VARIANTS_QUERY, "productVariants");
 
   return variants
-    .filter((variant) => variant.inventoryItem?.tracked)
     .filter((variant) => variant.product.status !== "ARCHIVED")
-    .map((variant) => ({
-      id: variant.id,
-      name: variant.displayName,
-      sku: variant.sku,
-      productId: variant.product.id,
-      inStock: variant.inventoryQuantity ?? 0,
-    }));
+    .map((variant) => {
+      // Tracked means Shopify counts its stock AND it can actually sell out.
+      // A gift card never sells out, even if "Track quantity" was switched on
+      // for it by mistake. A missing stock number means "unknown", not 0.
+      const tracked =
+        Boolean(variant.inventoryItem?.tracked) &&
+        !variant.product.isGiftCard &&
+        typeof variant.inventoryQuantity === "number";
+
+      return {
+        id: variant.id,
+        name: variant.displayName,
+        sku: variant.sku,
+        productId: variant.product.id,
+        tracked,
+        // null means "no stock count", which is different from 0 in stock.
+        inStock: tracked ? variant.inventoryQuantity : null,
+      };
+    });
 }
 
 /** Units sold per variant over the last `windowDays` days. */
@@ -120,7 +135,7 @@ async function fetchUnitsSold(admin, windowDays) {
 /** Everything the Runout page shows: the forecast table and summary counts. */
 export async function getRunoutReport(admin, windowDays = WINDOW_DAYS) {
   const [variants, unitsSold] = await Promise.all([
-    fetchTrackedVariants(admin),
+    fetchVariants(admin),
     fetchUnitsSold(admin, windowDays),
   ]);
 
